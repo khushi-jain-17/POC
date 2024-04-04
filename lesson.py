@@ -3,6 +3,8 @@ from .auth.myrole import *
 from .models import Lesson
 from .app import db
 
+
+
 mylesson = Blueprint('mylesson',__name__)
 
 
@@ -11,15 +13,45 @@ mylesson = Blueprint('mylesson',__name__)
 @role_required(1)
 def create():
     lid = request.json["lid"]
+    l_id = request.json["l_id"]
     title = request.json["title"]
     content = request.json["content"]
     cid = request.json["cid"]
-    new_lesson = Lesson(lid=lid,title=title,content=content,cid=cid)
+    new_lesson = Lesson(lid=lid,l_id=l_id,title=title,content=content,cid=cid)
     db.session.add(new_lesson)
     db.session.commit()
     return jsonify({'message': 'Lesson created successfully'}), 201
 
 
+@mylesson.route('/get_lesson', methods=['GET'])
+@role_required(1)
+def get_lesson():
+    lesson = Lesson.query.all()
+    output = []
+    for l in lesson:
+        ldata = {
+            'l_id': l.l_id,
+            'title': l.title,
+            'content':l.content,
+            'cid': l.cid,
+        }
+        output.append(ldata)
+    return jsonify(output)
+
+
+@mylesson.route('/get_course/<int:lid>',methods=['GET'])
+@role_required(1)
+def getbyid(lid):
+    lesson = Lesson.query.get_or_404(lid)
+    output=[]
+    ldata = {
+        'l_id': lesson.l_id,
+        'title': lesson.title,
+        'content':lesson.content,
+        'cid': lesson.cid,
+    }
+    output.append(ldata)
+    return jsonify({'lesson':output})
 
 
 @mylesson.route("/update_lesson/<int:lid>", methods=['PUT'])
@@ -27,6 +59,7 @@ def create():
 def update(lid):
     lesson = Lesson.query.get_or_404(lid)
     data = request.get_json()
+    lesson.l_id = data.get("l_id")
     lesson.title = data.get("title")
     lesson.content = data.get("content")
     lesson.cid = data.get("cid")
@@ -34,7 +67,7 @@ def update(lid):
     return jsonify({'message':'Lesson Updated Successfully'})
    
 
-@mylesson.route("/delette_lesson/<int:lid>", methods=['DELETE'])
+@mylesson.route("/delete_lesson/<int:lid>", methods=['DELETE'])
 @role_required(1)
 def delete(lid):
     lesson = Lesson.query.get_or_404(lid)

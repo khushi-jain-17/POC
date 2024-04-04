@@ -36,6 +36,15 @@ class Course(db.Model):
     fee = db.Column(db.String(100))
     ctime = db.Column(db.String(100),nullable=True)
     rating = db.Column(db.Float)
+    lessons = relationship('Lesson', back_populates='course', cascade='all, delete-orphan')
+
+    def serialize(self):
+        return {
+            'cid': self.cid,
+            'cname': self.cname,
+            'description': self.description,
+            'lessons': [lesson.serialize() for lesson in self.lessons]
+        }
 
 
 
@@ -43,7 +52,15 @@ class Lesson(db.Model):
     __tablename__ = 'lessons'
 
     lid = db.Column(db.Integer, primary_key=True)
+    l_id = db.Column(db.Integer)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     cid = db.Column(db.Integer, db.ForeignKey('courses.cid'))
-    course = db.relationship('Course', backref=db.backref('lessons', lazy=True))
+    course = db.relationship('Course', back_populates='lessons')
+
+    def serialize(self):
+        return {
+            'l_id': self.l_id,
+            'title': self.title,
+            'content': self.content,
+        }

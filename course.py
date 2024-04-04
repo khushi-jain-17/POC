@@ -24,7 +24,7 @@ def create():
 
 @mycourse.route('/get_course', methods=['GET'])
 @role_required(1)
-def get_course():
+def get_courses():
     course = Course.query.all()
     output = []
     for c in course:
@@ -80,6 +80,16 @@ def delete(cid):
 
 
 
-# @mycourse.route('/course_analytics',methods=['GET'])
-# @role_required(1)
-# def analytics():
+@mycourse.route('/course/<int:cid>', methods=['GET'])
+@role_required(1)
+def course_analytics(cid):
+    course = Course.query.get(cid)
+    if course:
+        return jsonify(course.serialize())
+    else:
+        return jsonify({'error': 'Course not found'}), 404
+    
+
+@mycourse.route('/sorting',methods=['GET'])
+def sorting():
+    pass
