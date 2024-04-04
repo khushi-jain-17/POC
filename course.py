@@ -31,10 +31,55 @@ def get_course():
         course_data = {
             'cid': c.cid,
             'cname': c.cname,
-            'descrifption':c.description,
+            'description':c.description,
             'fee':c.fee,
             'ctime':c.ctime,
             'rating':c.rating
         }
         output.append(course_data)
     return jsonify(output)
+
+
+@mycourse.route('/get_course/<int:cid>',methods=['GET'])
+@role_required(1)
+def getbyid(cid):
+    course = Course.query.get_or_404(cid)
+    output=[]
+    cdata = {
+        'cname': course.cname,
+        'description': course.description,
+        'fee':course.fee,
+        'ctime':course.ctime,
+        'rating':course.rating
+    }
+    output.append(cdata)
+    return jsonify({'course':output})
+
+
+@mycourse.route("/update_course/<int:cid>",methods=['PUT'])
+@role_required(1)
+def update(cid):
+    course = Course.query.get_or_404(cid)
+    data = request.get_json()
+    course.cname = data.get("cname")
+    course.description = data.get("description")
+    course.fee = data.get("fee")
+    course.ctime = data.get("ctime")
+    course.rating = data.get("rating")
+    db.session.commit()
+    return jsonify({'message':'Course Updated Successfully'})
+
+
+@mycourse.route("/delete_course/<int:cid>", methods=['DELETE'])
+@role_required(1)
+def delete(cid):
+    course = Course.query.get_or_404(cid)
+    db.session.delete(course)
+    db.session.commit()
+    return jsonify({'message': 'Course Deleted Successfully'})
+
+
+
+# @mycourse.route('/course_analytics',methods=['GET'])
+# @role_required(1)
+# def analytics():

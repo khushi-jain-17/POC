@@ -17,7 +17,7 @@ bcrypt = Bcrypt(app)
 auth=Blueprint('auth',__name__)
 
 
-@auth.route('/signup',methods=['POST'])
+@auth.route('/user/signup',methods=['POST'])
 def signup():
     user_schema = UserSchema()
     try:
@@ -34,7 +34,7 @@ def signup():
     db.session.commit()
 
     
-@auth.route('/login', methods=['POST'])
+@auth.route('/user/login', methods=['POST'])
 def login():
     data = request.get_json()
     uid = data.get("uid")

@@ -46,5 +46,4 @@ class Lesson(db.Model):
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     cid = db.Column(db.Integer, db.ForeignKey('courses.cid'))
-    # course = relationship('Course', back_populates='lessons')
     course = db.relationship('Course', backref=db.backref('lessons', lazy=True))

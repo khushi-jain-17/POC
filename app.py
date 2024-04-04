@@ -20,6 +20,9 @@ app.register_blueprint(auth)
 from .course import mycourse
 app.register_blueprint(mycourse)
 
+from .lesson import mylesson
+app.register_blueprint(mylesson)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
