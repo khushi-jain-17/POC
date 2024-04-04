@@ -75,3 +75,22 @@ def delete(lid):
     db.session.commit()
     return jsonify({'message': 'Lesson Deleted Successfully'})
 
+
+@mylesson.route("/lessons", methods=['GET'])
+def paginate():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 2, type=int)
+    lesson = Lesson.query.paginate(
+        page=page, per_page=per_page, error_out=True
+    )
+    output = []
+    for l in lesson:
+        ldata = {
+            "l_id": l.l_id,
+            "title": l.title,
+            "content": l.content,
+        }
+        output.append(ldata)
+    return jsonify({"lesson": output})
+
+

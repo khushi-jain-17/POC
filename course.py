@@ -92,4 +92,55 @@ def course_analytics(cid):
 
 @mycourse.route('/sorting',methods=['GET'])
 def sorting():
-    pass
+    courses = Course.query.order_by(Course.rating.desc()).all()
+    output = []
+    for c in courses:
+        course_data = {
+            'cid': c.cid,
+            'cname': c.cname,
+            'description':c.description,
+            'fee':c.fee,
+            'ctime':c.ctime,
+            'rating':c.rating
+        }
+        output.append(course_data)
+    return jsonify(output)
+
+
+@mycourse.route("/course", methods=['GET'])
+def paginate():
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 3, type=int)
+    course = Course.query.paginate(
+        page=page, per_page=per_page, error_out=True
+    )
+    output = []
+    for c in course:
+        cdata = {
+            "cid": c.cid,
+            'cname': c.cname,
+            'description':c.description,
+            'fee':c.fee,
+            'ctime':c.ctime,
+            'rating':c.rating
+        }
+        output.append(cdata)
+    return jsonify({"course": output})
+
+
+# @mycourse.route('/searching',methods=['GET'])
+# def search():
+
+#     query = Course.query.filter(Course.cname.ilike("%keyword%"))
+
+
+
+@app.route('/courses/search', methods=['GET'])
+def search_courses():
+    keyword = request.args.get('keyword')
+    query = Course.query
+    if keyword:
+        query = query.filter(Course.cname.ilike(f"%{keyword}%"))
+    courses = query.all()
+    data = [{'cid': course.cid, 'cname': course.cname, 'description': course.description, 'fee': course.fee, 'ctime': course.ctime, 'rating': course.rating} for course in courses]
+    return jsonify(data)    
