@@ -1,4 +1,3 @@
-# from  __init__ import app 
 from flask import Flask 
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate 
@@ -16,12 +15,14 @@ migrate = Migrate(app,db)
 from .auth.routes import auth 
 app.register_blueprint(auth)
 
-
 from .course import mycourse
 app.register_blueprint(mycourse)
 
 from .lesson import mylesson
 app.register_blueprint(mylesson)
+
+from .enroll import enrolled
+app.register_blueprint(enrolled)
 
 
 if __name__ == '__main__':

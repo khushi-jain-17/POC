@@ -3,11 +3,7 @@ from .auth.myrole import *
 from .models import Lesson
 from .app import db
 
-
-
 mylesson = Blueprint('mylesson',__name__)
-
-
 
 @mylesson.route("/create_lesson", methods=['POST'])
 @role_required(1)

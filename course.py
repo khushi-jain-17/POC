@@ -79,7 +79,6 @@ def delete(cid):
     return jsonify({'message': 'Course Deleted Successfully'})
 
 
-
 @mycourse.route('/course/<int:cid>', methods=['GET'])
 @role_required(1)
 def course_analytics(cid):
@@ -90,11 +89,24 @@ def course_analytics(cid):
         return jsonify({'error': 'Course not found'}), 404
     
 
-@mycourse.route('/sorting',methods=['GET'])
-def sorting():
-    courses = Course.query.order_by(Course.rating.desc()).all()
+@mycourse.route('/mycourses', methods=['GET'])
+@role_required(2)
+def courseAnalytics():
+    courses = Course.query.all()
+    serialized_courses = []
+    for course in courses:
+        serialized_course = course.serialize()
+        serialized_course['lessons'] = [lesson.serialize() for lesson in course.lessons]
+        serialized_courses.append(serialized_course)
+    return jsonify(serialized_courses)
+
+
+@mycourse.route('/dashboard', methods=['GET'])
+@role_required(1)
+def dashboard():
+    course = Course.query.all()
     output = []
-    for c in courses:
+    for c in course:
         course_data = {
             'cid': c.cid,
             'cname': c.cname,
@@ -107,7 +119,7 @@ def sorting():
     return jsonify(output)
 
 
-@mycourse.route("/course", methods=['GET'])
+@mycourse.route("/course/paginate", methods=['GET'])
 def paginate():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 3, type=int)
@@ -128,19 +140,3 @@ def paginate():
     return jsonify({"course": output})
 
 
-# @mycourse.route('/searching',methods=['GET'])
-# def search():
-
-#     query = Course.query.filter(Course.cname.ilike("%keyword%"))
-
-
-
-@app.route('/courses/search', methods=['GET'])
-def search_courses():
-    keyword = request.args.get('keyword')
-    query = Course.query
-    if keyword:
-        query = query.filter(Course.cname.ilike(f"%{keyword}%"))
-    courses = query.all()
-    data = [{'cid': course.cid, 'cname': course.cname, 'description': course.description, 'fee': course.fee, 'ctime': course.ctime, 'rating': course.rating} for course in courses]
-    return jsonify(data)    

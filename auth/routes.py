@@ -32,6 +32,7 @@ def signup():
                     password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
+    return jsonify({'message':'Register Successfully'}), 201
 
     
 @auth.route('/user/login', methods=['POST'])
@@ -43,35 +44,44 @@ def login():
     if user:
         if bcrypt.check_password_hash(user.password, password):
             courses = Course.query.all()
-            output = []
-            for c in courses:
-                course_data = {
-                    'cid': c.cid,
-                    'cname': c.cname,
-                    'descrifption':c.description,
-                    'fee':c.fee,
-                    'ctime':c.ctime,
-                    'rating':c.rating
-                }
-                output.append(course_data)
-            return jsonify(output)              
+            serialized_courses = []
+            for course in courses:
+                serialized_course = course.serialize()
+                serialized_course['lessons'] = [lesson.serialize() for lesson in course.lessons]
+                serialized_courses.append(serialized_course)
+            return jsonify(serialized_courses)             
         else:
             return jsonify({'error': 'Invalid credentials'}), 401
     else:
         return jsonify({'error': 'User not found'}), 404
 
+            
+@auth.route('/dashboard/user', methods=['GET'])
+def dashboard_user():
+    users = User.query.all()
+    output = []
+    for u in users:
+        udata = {
+            'uid': u.uid,
+            'uname': u.uname,
+            'email': u.email,
+            'password': u.password
+        }
+        output.append(udata)
+    return jsonify(output)
+
+
 @auth.route('/create/admin', methods=['POST'])
+@token_required
 def create_admin():
     data = request.get_json()
     admin_id = data.get("admin_id")
     password = data.get("password")
     role_id = data.get("role_id")
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
     new_admin = Admin(admin_id=admin_id, password=hashed_password, role_id=role_id)
     db.session.add(new_admin)
     db.session.commit()
-
     return jsonify({'message': 'Admin created successfully'}), 201        
 
 
@@ -95,3 +105,18 @@ def admin_login():
             return jsonify({'error': 'Invalid credentials'}), 401
     else:
         return jsonify({'error': 'Admin not found'}), 404
+    
+
+
+@auth.route('/dashboard/admin', methods=['GET'])
+def dashboard_admin():
+    admin = Admin.query.all()
+    output = []
+    for a in admin:
+        adata = {
+            'admin_id': a.admin_id,
+            'password': a.password,
+            'role_id':a.role_id
+        }
+        output.append(adata)
+    return jsonify(output)

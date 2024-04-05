@@ -1,5 +1,6 @@
 from .app import db
 from sqlalchemy.orm import relationship
+from sqlalchemy import DateTime
 
 
 class User(db.Model):
@@ -64,3 +65,18 @@ class Lesson(db.Model):
             'title': self.title,
             'content': self.content,
         }
+
+
+class Enroll(db.Model):
+    __tablename__ = 'enrolls'
+
+    eid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid = db.Column(db.Integer, db.ForeignKey('users.uid'), nullable=False)
+    epassword = db.Column(db.String(500),nullable=False)
+    cid = db.Column(db.Integer, db.ForeignKey('courses.cid'), nullable=False)
+    etime = db.Column(db.DateTime)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'), default=2)  
+    role = db.relationship('Role', backref=db.backref('enrolls', lazy=True))
+    course = db.relationship('Course',backref=db.backref('courses',lazy=True))
+    user = db.relationship('User',backref=db.backref('users',lazy=True))
+

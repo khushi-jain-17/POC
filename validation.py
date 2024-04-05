@@ -33,7 +33,6 @@ class UserSchema(Schema):
     password = fields.String(required=True, validate=PasswordValidator.validate_password)
 
 
-
 class RoleSchema(Schema):
     role_id = fields.Integer(dump_only=True)
     rname = fields.String(required=True, validate=validate.Length(min=1, max=50))
