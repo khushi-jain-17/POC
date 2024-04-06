@@ -1,6 +1,6 @@
 from flask import request,jsonify,Blueprint
 from .auth.myrole import *
-from .models import Enroll,User,Course
+from .models import Enroll,User,Course,Progress
 from .app import db
 from datetime import datetime, timedelta
 
@@ -60,7 +60,7 @@ def Top_rated_course():
 
 @enrolled.route('/dashboard/student',methods=['GET'])
 @role_required(1)
-def dashboard():
+def enroll_dashboard():
     query = db.session.query(
         Enroll.eid,
         Enroll.etime,
@@ -85,6 +85,55 @@ def dashboard():
             'email': result[5]
         })
     return jsonify(enrolled_users), 200
+
+
+@enrolled.route('/progress/track',methods=['POST'])
+@role_required(2)
+def my_progress():
+    data = request.get_json()
+    uid = data.get("uid")
+    cid = data.get("cid")
+    lesson_completed = data.get("lesson_completed")
+    eid = db.session.query(Enroll.eid).filter(Enroll.uid==uid).first()
+    id = eid[0]
+    lessons=5
+    total = (lesson_completed/lessons) * 100
+    myprogress = f"{total}%"
+    progress = Progress(uid=uid, cid=cid,eid=id, lesson_completed=lesson_completed, myprogress=myprogress)
+    db.session.add(progress)
+    db.session.commit()
+    return jsonify({"message": "Progress recorded successfully"}), 201
+
+
+@enrolled.route('/dashboard/progress',methods=['GET'])
+@role_required(1)
+def progress_dashboard():
+    query = db.session.query(
+        Progress.lesson_completed,
+        Progress.myprogress,
+        Enroll.eid,
+        Enroll.etime,
+        User.uname,
+        Course.cname
+    ).join(
+        Course,Progress.cid == Course.cid
+    ).join(
+        User, Progress.uid == User.uid
+    ).join(
+        Enroll, Progress.eid == Enroll.eid
+    )
+    results = query.all()
+    output = []
+    for result in results:
+        output.append({
+            'lesson_completed': result[0],
+            'progess': result[1],
+            'eid': result[2],
+            'etime': result[3],
+            'user_name': result[4],
+            'course_name': result[5],
+        })
+    return jsonify(output), 200
 
 
 @enrolled.route('/update/enroll/<int:eid>',methods=['UPDATE'])

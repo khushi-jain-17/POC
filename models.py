@@ -80,3 +80,16 @@ class Enroll(db.Model):
     course = db.relationship('Course',backref=db.backref('courses',lazy=True))
     user = db.relationship('User',backref=db.backref('users',lazy=True))
 
+
+class Progress(db.Model):
+    __tablename__ = 'progress'
+
+    sid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid = db.Column(db.Integer,db.ForeignKey('users.uid'),nullable=True)
+    cid = db.Column(db.Integer, db.ForeignKey('courses.cid'),nullable=False)
+    lesson_completed = db.Column(db.Integer,nullable=False)
+    myprogress = db.Column(db.String,nullable=False)
+    eid = db.Column(db.Integer, db.ForeignKey('enrolls.eid'),nullable=True)
+    course = db.relationship('Course',backref=db.backref('progresses',lazy=True))
+    user = db.relationship('User',backref=db.backref('progresses',lazy=True))
+    enroll = db.relationship('Enroll',backref=db.backref('progresses',lazy=True))

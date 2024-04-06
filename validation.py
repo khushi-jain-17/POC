@@ -73,11 +73,19 @@ class LessonSchema(Schema):
 class EnrollSchema(Schema):
     eid = fields.Integer(dump_only=True)
     uid = fields.Integer(required=True)
-    epassword = fields.String(required=True,validate=validate.Length(min=1,max=500))
+    epassword = fields.String(required=True,validate=validate.Length(min=1,max=100))
     cid = fields.Integer(required=True)
     etime = fields.DateTime()
     role_id = fields.Integer(default=2)
 
+
+class Progress(Schema):
+    sid = fields.Integer(dump_only=True)
+    uid = fields.Integer(required=True)
+    cid = fields.Integer(required=True)
+    lesson_completed = fields.Integer(required=True)
+    myprogress = fields.String(required=True,validate=validate.Length(min=1,max=100))
+    eid = fields.Integer(required=True)
 
 
 
