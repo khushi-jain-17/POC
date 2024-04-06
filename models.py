@@ -36,7 +36,7 @@ class Course(db.Model):
     description = db.Column(db.String(500),nullable=False)
     fee = db.Column(db.String(100))
     ctime = db.Column(db.String(100),nullable=True)
-    rating = db.Column(db.Float)
+    rating = db.Column(db.Float,nullable=False)
     lessons = relationship('Lesson', back_populates='course', cascade='all, delete-orphan')
 
     def serialize(self):

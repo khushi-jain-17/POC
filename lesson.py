@@ -5,7 +5,7 @@ from .app import db
 
 mylesson = Blueprint('mylesson',__name__)
 
-@mylesson.route("/create_lesson", methods=['POST'])
+@mylesson.route("/create/lesson", methods=['POST'])
 @role_required(1)
 def create():
     lid = request.json["lid"]
@@ -50,7 +50,7 @@ def getbyid(lid):
     return jsonify({'lesson':output})
 
 
-@mylesson.route("/update_lesson/<int:lid>", methods=['PUT'])
+@mylesson.route("/update/lesson/<int:lid>", methods=['PUT'])
 @role_required(1)
 def update(lid):
     lesson = Lesson.query.get_or_404(lid)
@@ -63,7 +63,7 @@ def update(lid):
     return jsonify({'message':'Lesson Updated Successfully'})
    
 
-@mylesson.route("/delete_lesson/<int:lid>", methods=['DELETE'])
+@mylesson.route("/delete/lesson/<int:lid>", methods=['DELETE'])
 @role_required(1)
 def delete(lid):
     lesson = Lesson.query.get_or_404(lid)
@@ -72,7 +72,7 @@ def delete(lid):
     return jsonify({'message': 'Lesson Deleted Successfully'})
 
 
-@mylesson.route("/lessons", methods=['GET'])
+@mylesson.route("/lessons/paginate", methods=['GET'])
 def paginate():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 2, type=int)

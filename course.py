@@ -6,7 +6,7 @@ from .app import db
 mycourse = Blueprint('mycourse',__name__)
 
 
-@mycourse.route("/create_course", methods=['POST'])
+@mycourse.route("/create/course", methods=['POST'])
 @role_required(1)
 def create():
     cid = request.json["cid"]
@@ -121,7 +121,7 @@ def dashboard():
 @mycourse.route("/course/paginate", methods=['GET'])
 def paginate():
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 3, type=int)
+    per_page = request.args.get('per_page', 2, type=int)
     course = Course.query.paginate(
         page=page, per_page=per_page, error_out=True
     )
