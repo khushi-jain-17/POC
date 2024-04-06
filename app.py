@@ -24,6 +24,9 @@ app.register_blueprint(mylesson)
 from .enroll import enrolled
 app.register_blueprint(enrolled)
 
+from .student import student_track
+app.register_blueprint(student_track)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

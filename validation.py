@@ -88,6 +88,11 @@ class Progress(Schema):
     eid = fields.Integer(required=True)
 
 
+class AssignmentSchema(Schema):
+    aid = fields.Integer(dump_only=True)
+    qid = fields.Integer(required=True)
+    question = fields.String(required=True)
+    cid = fields.Integer()
 
 
 

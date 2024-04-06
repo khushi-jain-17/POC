@@ -48,7 +48,6 @@ class Course(db.Model):
         }
 
 
-
 class Lesson(db.Model):
     __tablename__ = 'lessons'
 
@@ -93,3 +92,13 @@ class Progress(db.Model):
     course = db.relationship('Course',backref=db.backref('progresses',lazy=True))
     user = db.relationship('User',backref=db.backref('progresses',lazy=True))
     enroll = db.relationship('Enroll',backref=db.backref('progresses',lazy=True))
+
+
+class Assignment(db.Model):
+    __tablename__ = 'assignment'
+
+    aid = db.Column(db.Integer,primary_key=True, autoincrement=True)
+    qid = db.Column(db.Integer)
+    question = db.Column(db.Text, nullable=False)
+    cid = db.Column(db.Integer, db.ForeignKey('courses.cid'),nullable=False)
+    course = db.relationship('Course',backref=db.backref('mycourse',lazy=True))

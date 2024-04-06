@@ -107,7 +107,6 @@ def admin_login():
         return jsonify({'error': 'Admin not found'}), 404
     
 
-
 @auth.route('/dashboard/admin', methods=['GET'])
 def dashboard_admin():
     admin = Admin.query.all()
