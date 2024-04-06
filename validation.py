@@ -1,6 +1,13 @@
 from marshmallow import Schema, fields, validate, ValidationError 
 import re
 
+
+class UsernameValidator:
+    @staticmethod
+    def validate_name(uname):
+        if uname[0].islower():
+            raise ValidationError("Username must start with a capital letter")
+
 class EmailValidator:
     @staticmethod
     def validate_email(email):
@@ -28,13 +35,13 @@ class PasswordValidator:
 
 class UserSchema(Schema):
     uid = fields.Integer(required = True)
-    uname = fields.String(required=True, validate=validate.Length(min=1, max=100))
+    uname = fields.String(required=True, validate=[UsernameValidator.validate_name, validate.Length(min=1, max=100)])
     email = fields.Email(required=True, validate=EmailValidator.validate_email)
     password = fields.String(required=True, validate=PasswordValidator.validate_password)
 
 
 class RoleSchema(Schema):
     role_id = fields.Integer(dump_only=True)
-    rname = fields.String(required=True, validate=validate.Length(min=1, max=50))
+    rname = fields.String(required=True, validate=validate.Length(min=1, max=100))
 
 

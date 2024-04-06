@@ -21,7 +21,6 @@ def create():
     return jsonify({'message': 'course created successfully'}), 201
 
 
-
 @mycourse.route('/get_course', methods=['GET'])
 @role_required(1)
 def get_courses():
@@ -56,7 +55,7 @@ def getbyid(cid):
     return jsonify({'course':output})
 
 
-@mycourse.route("/update_course/<int:cid>",methods=['PUT'])
+@mycourse.route("/update/course/<int:cid>",methods=['PUT'])
 @role_required(1)
 def update(cid):
     course = Course.query.get_or_404(cid)
@@ -70,7 +69,7 @@ def update(cid):
     return jsonify({'message':'Course Updated Successfully'})
 
 
-@mycourse.route("/delete_course/<int:cid>", methods=['DELETE'])
+@mycourse.route("/delete/course/<int:cid>", methods=['DELETE'])
 @role_required(1)
 def delete(cid):
     course = Course.query.get_or_404(cid)
@@ -101,7 +100,7 @@ def courseAnalytics():
     return jsonify(serialized_courses)
 
 
-@mycourse.route('/dashboard', methods=['GET'])
+@mycourse.route('/dashboard/course', methods=['GET'])
 @role_required(1)
 def dashboard():
     course = Course.query.all()

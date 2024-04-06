@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 enrolled = Blueprint('enrolled',__name__)
 
 
-
 @enrolled.route('/enroll/user',methods=['POST'])
 def enroll_user():
     data = request.get_json()
@@ -43,7 +42,7 @@ def search_courses():
 
 @enrolled.route('/sorting',methods=['GET'])
 @role_required(2)
-def sorting():
+def Top_rated_course():
     courses = Course.query.order_by(Course.rating.desc()).all()
     output = []
     for c in courses:
@@ -59,7 +58,7 @@ def sorting():
     return jsonify(output)
 
 
-@enrolled.route('/student/dashboard',methods=['GET'])
+@enrolled.route('/dashboard/student',methods=['GET'])
 @role_required(1)
 def dashboard():
     query = db.session.query(
@@ -86,3 +85,25 @@ def dashboard():
             'email': result[5]
         })
     return jsonify(enrolled_users), 200
+
+
+@enrolled.route('/update/enroll/<int:eid>',methods=['UPDATE'])
+@role_required(1)
+def update(eid):
+    student = Enroll.query.get_or_404(eid)
+    data = request.get_json()
+    student.cid = data.get("cid")
+    student.uid = data.get("uid")
+    db.session.commit()
+    return jsonify({'message':'Enrollment Updated Successfully'})
+
+
+
+@enrolled.route('/disenroll/<int:eid>',methods=['DELETE'])
+@role_required(1)
+def disenroll(eid):
+    student = Course.query.get_or_404(eid)
+    db.session.delete(student)
+    db.session.commit()
+    return jsonify({'message': 'Disenrolled from Course Successfully'})
+
