@@ -113,5 +113,9 @@ class Assignment(db.Model):
         return {
             'qid': self.qid,
             'question': self.question,
-            'course': self.course.cname  # Accessing cname attribute from the associated Course object
+            'course': self.course.cname  
         }
+    
+
+
+    

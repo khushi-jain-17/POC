@@ -25,10 +25,11 @@ def progress():
     if old_progress:
         db.session.delete(old_progress)
         db.session.commit()
+    elif not old_progress:    
         progress = Progress(uid=uid, cid=cid, created_at=created_at, eid=id, lesson_completed=lesson_completed, myprogress=myprogress)
         db.session.add(progress)
         db.session.commit()
-        return jsonify({"message": "Progress recorded successfully"}), 201
+    return jsonify({"message": "Progress recorded successfully"}), 201
 
 
 @student_track.route('/myprogress/track',methods=['POST'])
@@ -78,7 +79,7 @@ def progress_dashboard():
             'user_name': result[4],
             'course_name': result[5],
         })
-    return jsonify(output), 
+    return jsonify(output),200
 
 
 @student_track.route("/create/assignment", methods=['POST'])
@@ -91,26 +92,11 @@ def create():
     db.session.add(adata)
     db.session.commit()
     return jsonify({'message': 'Assignment created successfully'}), 201
-
-
-@student_track.route('/check_eligibility', methods=['GET'])
-@role_required(2)
-def check_eligibility():
-    data = request.get_json()
-    uid = data.get("uid")
-    cid = data.get("cid")
-    progress = Progress.query.filter_by(uid=uid, cid=cid).first()
-    if not progress.myprogress:
-        return jsonify({"error": "Progress not found for the student in this course."}), 404
-    if progress.myprogress == "100.0%":
-        return jsonify({"message": "You are eligible for the assignment."}), 200
-    else:
-        return jsonify({"message": "Keep working! You are not eligible for the assignment yet."}), 200
     
  
 @student_track.route('/eligibility', methods=['GET'])
 @role_required(2)
-def CheckEligibility():
+def Check_Eligibility():
     data = request.get_json()
     uid = data.get("uid")
     cid = data.get("cid")
