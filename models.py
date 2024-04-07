@@ -1,6 +1,6 @@
 from .app import db
 from sqlalchemy.orm import relationship
-from sqlalchemy import DateTime
+from datetime import datetime
 
 
 class User(db.Model):
@@ -38,12 +38,16 @@ class Course(db.Model):
     ctime = db.Column(db.String(100),nullable=True)
     rating = db.Column(db.Float,nullable=False)
     lessons = relationship('Lesson', back_populates='course', cascade='all, delete-orphan')
+    assignment = db.relationship('Assignment', back_populates='course', cascade='all, delete-orphan')
 
     def serialize(self):
         return {
             'cid': self.cid,
             'cname': self.cname,
             'description': self.description,
+            'fee': self.fee,
+            'ctime':self.ctime,
+            'rating':self.rating,
             'lessons': [lesson.serialize() for lesson in self.lessons]
         }
 
@@ -85,6 +89,7 @@ class Progress(db.Model):
 
     sid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uid = db.Column(db.Integer,db.ForeignKey('users.uid'),nullable=True)
+    created_at = db.Column(db.TIMESTAMP, default=datetime.utcnow)
     cid = db.Column(db.Integer, db.ForeignKey('courses.cid'),nullable=False)
     lesson_completed = db.Column(db.Integer,nullable=False)
     myprogress = db.Column(db.String,nullable=False)
@@ -101,4 +106,12 @@ class Assignment(db.Model):
     qid = db.Column(db.Integer)
     question = db.Column(db.Text, nullable=False)
     cid = db.Column(db.Integer, db.ForeignKey('courses.cid'),nullable=False)
-    course = db.relationship('Course',backref=db.backref('mycourse',lazy=True))
+    # course = db.relationship('Course',backref=db.backref('mycourse',lazy=True))
+    course = relationship('Course', back_populates='assignment')
+
+    def serialize(self):
+        return {
+            'qid': self.qid,
+            'question': self.question,
+            'course': self.course.cname  # Accessing cname attribute from the associated Course object
+        }

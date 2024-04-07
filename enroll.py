@@ -1,6 +1,6 @@
 from flask import request,jsonify,Blueprint
 from .auth.myrole import *
-from .models import Enroll,User,Course,Progress
+from .models import Enroll,User,Course
 from .app import db
 from datetime import datetime, timedelta
 
