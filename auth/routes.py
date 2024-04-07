@@ -7,10 +7,10 @@ from datetime import datetime, timedelta
 from flask import request,jsonify, Blueprint 
 from flask_bcrypt import bcrypt 
 from flask_bcrypt import Bcrypt 
-from .gen_token import * 
 from ..validation import *
 from ..app import db
 from ..models import User,Course,Admin
+from ..app import app
 
 bcrypt = Bcrypt(app)
 
@@ -72,7 +72,6 @@ def dashboard_user():
 
 
 @auth.route('/create/admin', methods=['POST'])
-@token_required
 def create_admin():
     data = request.get_json()
     admin_id = data.get("admin_id")

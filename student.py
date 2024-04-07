@@ -3,13 +3,35 @@ from .auth.myrole import *
 from .models import Enroll,Progress,Course,User,Assignment
 from .app import db
 from datetime import datetime, timedelta
-from sqlalchemy import func 
+
 
 student_track = Blueprint("student_track",__name__)
 
 
 
 @student_track.route('/progress/track',methods=['POST'])
+def progress():
+    data = request.get_json()
+    uid = data.get("uid")
+    cid = data.get("cid")
+    created_at = datetime.now().strftime("%Y-%m-%dT%H:%M")
+    lesson_completed = data.get("lesson_completed")
+    eid = db.session.query(Enroll.eid).filter(Enroll.uid==uid).first()
+    id = eid[0]
+    lessons = 5
+    total = (lesson_completed / lessons) * 100
+    myprogress = f"{total}%"
+    old_progress = Progress.query.filter_by(uid=uid).first()
+    if old_progress:
+        db.session.delete(old_progress)
+        db.session.commit()
+        progress = Progress(uid=uid, cid=cid, created_at=created_at, eid=id, lesson_completed=lesson_completed, myprogress=myprogress)
+        db.session.add(progress)
+        db.session.commit()
+        return jsonify({"message": "Progress recorded successfully"}), 201
+
+
+@student_track.route('/myprogress/track',methods=['POST'])
 @role_required(2)
 def my_progress():
     data = request.get_json()
@@ -78,9 +100,9 @@ def check_eligibility():
     uid = data.get("uid")
     cid = data.get("cid")
     progress = Progress.query.filter_by(uid=uid, cid=cid).first()
-    if not progress:
+    if not progress.myprogress:
         return jsonify({"error": "Progress not found for the student in this course."}), 404
-    if progress.myprogress == "100%":
+    if progress.myprogress == "100.0%":
         return jsonify({"message": "You are eligible for the assignment."}), 200
     else:
         return jsonify({"message": "Keep working! You are not eligible for the assignment yet."}), 200
@@ -94,17 +116,11 @@ def CheckEligibility():
     cid = data.get("cid")
     assignments = Assignment.query.filter_by(cid=cid).all()
     serialized_assignments = [assignment.serialize() for assignment in assignments]
-    # myprogress = Progress.query.filter_by(uid=uid, cid=cid)
-    # myprogress = Progress.query.filter_by(uid=uid, cid=cid).order_by(Progress.created_at.desc()).first()
-
-    myprogress=(db.session.query(Progress.sid, Progress.cid,func.max(Progress.created_at).label('created_at'))
-                   .group_by(Progress.sid, Progress.cid)
-                   .first())
-    # myprogress = Progress.query.filter_by(uid=uid, cid=cid).order_by(Progress.sid.desc())
-    if not myprogress:
+    p = Progress.query.filter_by(uid=uid, cid=cid).first()
+    if not p.myprogress:
         return jsonify({"error": "Progress not found for the student in this course."}), 404
-    if myprogress == "100%" :
-        return jsonify({"message":"you are eligible"}), 200
+    if p.myprogress == "100.0%" :
+        return jsonify({"message":"You are eligible for the assignment", "assignments":serialized_assignments}), 200
     else:
         return jsonify({"message": "Keep working! You are not eligible for the assignment yet."}), 200
     
