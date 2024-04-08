@@ -96,7 +96,7 @@ def admin_login():
             token = jwt.encode({
                 'admin_id': admin.admin_id,
                 'role_id': admin.role_id,
-                'exp': datetime.utcnow() + timedelta(minutes=30)
+                'exp': datetime.utcnow() + timedelta(days=1)
             }, app.config['SECRET_KEY'], algorithm='HS256')
 
             return jsonify({'token': token}), 201

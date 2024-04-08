@@ -1,6 +1,6 @@
 from flask import request,jsonify,Blueprint
 from .auth.myrole import *
-from .models import Enroll,Progress,Course,User,Assignment
+from .models import Enroll,Progress,Course,User,Assignment,Quiz,Lesson
 from .app import db
 from datetime import datetime, timedelta
 
@@ -117,3 +117,27 @@ def get_assignments_by_course(cid):
     serialized_assignments = [assignment.serialize() for assignment in assignments]
     return jsonify(serialized_assignments)
 
+
+
+@student_track.route("/create/quiz", methods=['POST'])
+@role_required(1)
+def create_quiz():
+    q_id = request.json["q_id"]
+    qcontent = request.json["qcontent"]
+    options = request.json["options"]
+    cid = request.json["cid"]
+    l_id = request.json["l_id"]
+    new_quiz = Quiz(q_id=q_id,qcontent=qcontent,options=options,cid=cid,l_id=l_id)
+    db.session.add(new_quiz)
+    db.session.commit()
+    return jsonify({'message': 'Quiz created successfully'}), 201
+
+
+@student_track.route('/quiz/<int:l_id>', methods=['GET'])
+@role_required(1)
+def lesson_analytics(l_id):
+    quiz = Quiz.query.get(l_id)
+    if quiz:
+        return jsonify(quiz.serialize())
+    else:
+        return jsonify({'error': 'Lesson not found'}), 404

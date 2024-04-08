@@ -39,6 +39,9 @@ class Course(db.Model):
     rating = db.Column(db.Float,nullable=False)
     lessons = relationship('Lesson', back_populates='course', cascade='all, delete-orphan')
     assignment = db.relationship('Assignment', back_populates='course', cascade='all, delete-orphan')
+    # quiz = db.relationship('Quiz', back_populates='mycourse', cascade='all, delete-orphan')
+    quizzes = relationship('Quiz', back_populates='mycourse', primaryjoin="Course.cid == Quiz.cid")
+
 
     def serialize(self):
         return {
@@ -61,6 +64,7 @@ class Lesson(db.Model):
     content = db.Column(db.Text, nullable=False)
     cid = db.Column(db.Integer, db.ForeignKey('courses.cid'))
     course = db.relationship('Course', back_populates='lessons')
+    # quiz = db.relationship('Quiz', back_populates='mylesson', cascade='all, delete-orphan')
 
     def serialize(self):
         return {
@@ -113,9 +117,30 @@ class Assignment(db.Model):
         return {
             'qid': self.qid,
             'question': self.question,
-            'course': self.course.cname  
+            'course': self.course.cname,  
         }
-    
+
+
+class Quiz(db.Model):
+    __tablename__ = 'quiz'
+
+    quiz_id = db.Column(db.Integer,primary_key=True, autoincrement=True)
+    q_id = db.Column(db.Integer)
+    qcontent = db.Column(db.Text, nullable=False)
+    options = db.Column(db.Text, nullable=False)
+    cid = db.Column(db.Integer, db.ForeignKey('courses.cid'),nullable=False)
+    l_id = db.Column(db.Integer, nullable=False)
+    mycourse = relationship('Course', back_populates='quizzes')
+
+    def serialize(self):
+        return {
+            'q_id': self.q_id,
+            'qcontent': self.qcontent,
+            'options': self.options,
+            'mycourse': self.mycourse.cname
+        }
+
+
 
 
     
