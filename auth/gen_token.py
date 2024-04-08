@@ -1,8 +1,4 @@
 import jwt 
-# from flask_bcrypt import generate_password_hash
-# from flask_bcrypt import check_password_hash
-# from datetime import datetime
-# from datetime import datetime, timedelta
 from flask import request,jsonify
 from functools import wraps 
 from  ..app import app
